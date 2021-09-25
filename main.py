@@ -1,4 +1,5 @@
 import logging
+import socket
 from pathlib import Path
 
 from bottle import Bottle, run, static_file
@@ -26,5 +27,10 @@ def static(filepath: str) -> str:
     return static_file(filepath, root=str(WEB_APP_PATH))
 
 
-logger.debug("Starting server")
-run(app, host="localhost", port=8080, debug=True)
+with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+    sock.connect(("8.8.8.8", 80))
+    ip = sock.getsockname()[0]
+
+
+logger.info(f"Starting server at http://{ip}")
+run(app, host="0.0.0.0", port=80, debug=True)
