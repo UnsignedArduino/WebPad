@@ -9,14 +9,15 @@ let lastMouseY = -1;
 const padX = 0;
 const padY = 30;
 
+const ipAddr = null;
+const port = null;
+
 let padCanvas;
 
 function setup() {
   noPulldownRefresh();
-
   width = windowWidth;
   height = windowHeight;
-
   createCanvas(width, height - 5);
   padCanvas = createGraphics(width - padX, height - padY);
   padCanvas.clear();
@@ -25,8 +26,14 @@ function setup() {
 
 function draw() {
   background(220);
+  updateTopBarStuff();
   updateCursor();
   image(padCanvas, padX, padY);
+}
+
+function updateTopBarStuff() {
+  fill(0);
+  text("Status: Disconnected", 10, 20);
 }
 
 function updateCursor() {
