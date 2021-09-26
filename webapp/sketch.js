@@ -27,10 +27,12 @@ function setup() {
     socket = io("ws://" + ipAddr);
     socket.on("connect", () => {
         status = "Connected";
+        console.log("Connected")
         timer = setTimeout(testSocketIO, 1000);
     })
     socket.on("disconnect", () => {
         status = "Disconnected";
+        console.log("Disconnected")
         clearTimeout(timer);
     })
 }
@@ -41,6 +43,7 @@ let count = 0;
 function testSocketIO() {
     socket.emit("count", count);
     count += 1;
+    timer = setTimeout(testSocketIO, 1000);
 }
 
 function draw() {
