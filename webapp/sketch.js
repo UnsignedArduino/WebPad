@@ -6,11 +6,12 @@ let height;
 let lastMouseX = -1;
 let lastMouseY = -1;
 
+let status = "Disconnected";
+
 const padX = 0;
 const padY = 30;
 
 const ipAddr = null;
-const port = null;
 
 let padCanvas;
 
@@ -33,7 +34,7 @@ function draw() {
 
 function updateTopBarStuff() {
   fill(0);
-  text("Status: Disconnected", 10, 20);
+  text("Status: " + status, 10, 20);
 }
 
 function updateCursor() {
