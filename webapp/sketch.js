@@ -11,13 +11,12 @@ let status = "Not connected";
 const padY = 30;
 
 let socket;
-let pollingDelay = 100;
+let pollingDelay = 25;
 
 let padCanvas;
 
 function setup() {
     noPulldownRefresh();
-    noScrolling();
     width = windowWidth;
     height = windowHeight;
     createCanvas(width, height - 5);
@@ -89,15 +88,6 @@ function mouseReleased() {
     return false;
 }
 
-// https://stackoverflow.com/q/2890361/10291933
-function noScrolling() {
-    let stopScrolling = (e) => {
-        e.preventDefault();
-    }
-    document.addEventListener("touchstart", stopScrolling, false);
-    document.addEventListener("touchmove", stopScrolling, false);
-}
-
 // https://stackoverflow.com/a/55832568/10291933
 function noPulldownRefresh() {
     var touchStartHandler,
@@ -124,11 +114,14 @@ function noPulldownRefresh() {
             }
 
             // We only need to defaultPrevent when scrolling up
-            newTouchPoint = event.touches[0].clientY;
-            if (newTouchPoint > touchPoint) {
-                event.preventDefault();
-            }
-            touchPoint = newTouchPoint;
+            //
+            // newTouchPoint = event.touches[0].clientY;
+            // if (newTouchPoint > touchPoint) {
+            //     event.preventDefault();
+            // }
+            // touchPoint = newTouchPoint;
+
+            event.preventDefault();
         };
 
         document.addEventListener("touchstart", touchStartHandler, {
