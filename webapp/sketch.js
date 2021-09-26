@@ -7,7 +7,6 @@ let lastMouseX = -1;
 let lastMouseY = -1;
 
 let status = "Not connected";
-let startPong;
 
 const padY = 30;
 
@@ -29,23 +28,12 @@ function setup() {
     socket.on("connect", () => {
         status = "Connected";
         console.log("Connected as socket ID " + socket.id)
-        ping();
-    })
-    socket.on("our_pong", () => {
-        let latency = Date.now() - startPong;
-        status = "Connected - latency is " + latency + " ms"
-        setTimeout(ping, 1000);
     })
     socket.on("disconnect", () => {
         status = "Disconnected";
         console.log("Disconnected")
     })
     updateCursor();
-}
-
-function ping() {
-    startPong = Date.now();
-    socket.emit("our_ping");
 }
 
 function draw() {
@@ -103,9 +91,11 @@ function mouseReleased() {
 
 // https://stackoverflow.com/q/2890361/10291933
 function noScrolling() {
-    document.ontouchstart = (e) => {
+    let stopScrolling = (e) => {
         e.preventDefault();
     }
+    document.addEventListener("touchstart", stopScrolling, false);
+    document.addEventListener("touchmove", stopScrolling, false);
 }
 
 // https://stackoverflow.com/a/55832568/10291933

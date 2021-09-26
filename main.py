@@ -55,11 +55,6 @@ async def move_to(sid: str, data: dict):
     pyautogui.moveRel(round(data["delta_x"]), round(data["delta_y"]))
 
 
-@sio.on("our_ping")
-async def our_ping(sid: str):
-    await sio.emit("our_pong")
-
-
 @sio.event
 async def disconnect(sid: str):
     logger.warning(f"Disconnect from Socket {sid}")
