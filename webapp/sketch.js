@@ -16,47 +16,47 @@ const ipAddr = null;
 let padCanvas;
 
 function setup() {
-  noPulldownRefresh();
-  width = windowWidth;
-  height = windowHeight;
-  createCanvas(width, height - 5);
-  padCanvas = createGraphics(width - padX, height - padY);
-  padCanvas.clear();
-  padCanvas.background(200);
+    noPulldownRefresh();
+    width = windowWidth;
+    height = windowHeight;
+    createCanvas(width, height - 5);
+    padCanvas = createGraphics(width - padX, height - padY);
+    padCanvas.clear();
+    padCanvas.background(200);
 }
 
 function draw() {
-  background(220);
-  updateTopBarStuff();
-  updateCursor();
-  image(padCanvas, padX, padY);
+    background(220);
+    updateTopBarStuff();
+    updateCursor();
+    image(padCanvas, padX, padY);
 }
 
 function updateTopBarStuff() {
-  fill(0);
-  text("Status: " + status, 10, 20);
+    fill(0);
+    text("Status: " + status, 10, 20);
 }
 
 function updateCursor() {
-  stroke(0);
-  if (mouseIsPressed) {
-    if (lastMouseX != -1 && lastMouseY != -1) {
-      padCanvas.line(lastMouseX - padX, lastMouseY - padY,
-                     mouseX - padX, mouseY - padY);
+    stroke(0);
+    if (mouseIsPressed) {
+        if (lastMouseX != -1 && lastMouseY != -1) {
+            padCanvas.line(lastMouseX - padX, lastMouseY - padY,
+                           mouseX - padX, mouseY - padY);
+        }
+        fill(0);
+        padCanvas.circle(mouseX - padX, mouseY - padY, 2);
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
     }
-    fill(0);
-    padCanvas.circle(mouseX - padX, mouseY - padY, 2);
-    lastMouseX = mouseX;
-    lastMouseY = mouseY;
-  }
 }
 
 function mouseReleased() {
-  lastMouseX = -1;
-  lastMouseY = -1;
-  padCanvas.clear();
-  padCanvas.background(200);
-  return false;
+    lastMouseX = -1;
+    lastMouseY = -1;
+    padCanvas.clear();
+    padCanvas.background(200);
+    return false;
 }
 
 // https://stackoverflow.com/a/55832568/10291933
