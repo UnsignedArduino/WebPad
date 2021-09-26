@@ -1,1 +1,2 @@
-bottle
+aiohttp
+python-socketio

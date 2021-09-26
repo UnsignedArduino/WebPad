@@ -2,7 +2,7 @@ import logging
 import socket
 from pathlib import Path
 
-from bottle import Bottle, run, static_file
+from aiohttp import web
 
 from create_logger import create_logger
 
@@ -12,23 +12,32 @@ WEB_APP_PATH = Path.cwd() / "webapp"
 INDEX_HTML_PATH = WEB_APP_PATH / "index.html"
 SKETCH_JS_PATH = WEB_APP_PATH / "sketch.js"
 
-app = Bottle()
+routes = web.RouteTableDef()
 
 
-@app.route("/")
-def index() -> str:
-    return INDEX_HTML_PATH.read_text()
+@routes.get("/")
+async def index_html(_) -> web.Response:
+    html = INDEX_HTML_PATH.read_text(encoding="utf-8")
+    return web.Response(text=html, content_type="text/html")
 
 
-@app.route("/<filename>")
-def static(filename: str) -> str:
+@routes.get("/{filename}")
+async def static_file(request: web.Request) -> web.Response:
+    filename = request.match_info.get("filename", "index.html")
     if filename == "sketch.js":
         js = SKETCH_JS_PATH.read_text()
         js = js.replace("const ipAddr = null;",
                         f"const ipAddr = \"{ip}\";")
-        return js
+        return web.Response(text=js, content_type="text/javascript")
     else:
-        return static_file(filename, WEB_APP_PATH)
+        path = WEB_APP_PATH / filename
+        if not path.exists():
+            return web.Response(status=404)
+        stuff = path.read_text(encoding="utf-8")
+        mimetypes = {".js": "text/javascript",
+                     ".html": "text/html"}
+        mimetype = mimetypes.get(path.suffix, "text/plain")
+        return web.Response(text=stuff, content_type=mimetype)
 
 
 logger.debug("Obtaining IP address")
@@ -37,5 +46,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
     ip = sock.getsockname()[0]
 
 
+app = web.Application()
+app.add_routes(routes)
+
 logger.info(f"Starting server at http://{ip}")
-run(app, host="0.0.0.0", port=80, debug=True)
+web.run_app(app, host="0.0.0.0", port=80)
