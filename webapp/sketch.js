@@ -18,6 +18,7 @@ let padCanvas;
 
 function setup() {
     noPulldownRefresh();
+    noScrolling();
     width = windowWidth;
     height = windowHeight;
     createCanvas(width, height - 5);
@@ -98,6 +99,13 @@ function mouseReleased() {
     padCanvas.clear();
     padCanvas.background(200);
     return false;
+}
+
+// https://stackoverflow.com/q/2890361/10291933
+function noScrolling() {
+    document.ontouchstart = (e) => {
+        e.preventDefault();
+    }
 }
 
 // https://stackoverflow.com/a/55832568/10291933
