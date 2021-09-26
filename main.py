@@ -17,7 +17,7 @@ SKETCH_JS_PATH = WEB_APP_PATH / "sketch.js"
 routes = web.RouteTableDef()
 sio = socketio.AsyncServer(async_mode="aiohttp")
 
-pyautogui.PAUSE = 0.025
+pyautogui.PAUSE = 0
 
 
 @routes.get("/")

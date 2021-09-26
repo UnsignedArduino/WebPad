@@ -81,6 +81,7 @@ function updateCursor() {
 }
 
 function mouseReleased() {
+    updateCursor();
     lastMouseX = -1;
     lastMouseY = -1;
     padCanvas.clear();
