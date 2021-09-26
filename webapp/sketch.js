@@ -12,6 +12,7 @@ const padX = 0;
 const padY = 30;
 
 const ipAddr = null;
+let socket;
 
 let padCanvas;
 
@@ -23,6 +24,23 @@ function setup() {
     padCanvas = createGraphics(width - padX, height - padY);
     padCanvas.clear();
     padCanvas.background(200);
+    socket = io("ws://" + ipAddr);
+    socket.on("connect", () => {
+        status = "Connected";
+        timer = setTimeout(testSocketIO, 1000);
+    })
+    socket.on("disconnect", () => {
+        status = "Disconnected";
+        clearTimeout(timer);
+    })
+}
+
+let timer;
+let count = 0;
+
+function testSocketIO() {
+    socket.emit("count", count);
+    count += 1;
 }
 
 function draw() {
