@@ -8,7 +8,6 @@ let lastMouseY = -1;
 
 let status = "Not connected";
 
-const padX = 0;
 const padY = 30;
 
 let socket;
@@ -20,13 +19,13 @@ function setup() {
     width = windowWidth;
     height = windowHeight;
     createCanvas(width, height - 5);
-    padCanvas = createGraphics(width - padX, height - padY);
+    padCanvas = createGraphics(width, height - padY);
     padCanvas.clear();
     padCanvas.background(200);
     socket = io();
     socket.on("connect", () => {
         status = "Connected";
-        console.log("Connected")
+        console.log("Connected as socket ID " + socket.id)
     })
     socket.on("disconnect", () => {
         status = "Disconnected";
@@ -38,7 +37,7 @@ function draw() {
     background(220);
     updateTopBarStuff();
     updateCursor();
-    image(padCanvas, padX, padY);
+    image(padCanvas, 0, padY);
 }
 
 function updateTopBarStuff() {
@@ -49,12 +48,22 @@ function updateTopBarStuff() {
 function updateCursor() {
     stroke(0);
     if (mouseIsPressed) {
+        let last_x = lastMouseX;
+        let last_y = lastMouseY - padY;
+        let x = mouseX;
+        let y = mouseY - padY;
+        if ((last_x == x && last_y == y) ||
+            (x > windowWidth || x < 0) ||
+            (y > windowHeight || y < padY / 2)) {
+            return;
+        }
         if (lastMouseX != -1 && lastMouseY != -1) {
-            padCanvas.line(lastMouseX - padX, lastMouseY - padY,
-                           mouseX - padX, mouseY - padY);
+            padCanvas.line(last_x, last_y, x, y);
+            socket.emit("move_to", {"last_x": last_x, "last_y": last_y,
+                                    "x": x, "y": y})
         }
         fill(0);
-        padCanvas.circle(mouseX - padX, mouseY - padY, 2);
+        padCanvas.circle(x, y, 2);
         lastMouseX = mouseX;
         lastMouseY = mouseY;
     }

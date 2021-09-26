@@ -46,6 +46,11 @@ async def connect(sid: str, environ: dict):
     logging.debug(f"Request info: {environ}")
 
 
+@sio.on("move_to")
+async def move_to(sid: str, data: dict):
+    logger.debug(f"Socket {sid} got: {data}")
+
+
 @sio.event
 async def disconnect(sid: str):
     logger.warning(f"Disconnect from Socket {sid}")
