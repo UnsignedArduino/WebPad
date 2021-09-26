@@ -11,6 +11,7 @@ let status = "Not connected";
 const padY = 30;
 
 let socket;
+let pollingDelay = 100;
 
 let padCanvas;
 
@@ -61,7 +62,7 @@ function updateCursor() {
         if ((last_x == x && last_y == y) ||
             (x > windowWidth || x < 0) ||
             (y > windowHeight || y < padY / 2)) {
-            setTimeout(updateCursor, 100);
+            setTimeout(updateCursor, pollingDelay);
             return;
         }
         if (lastMouseX != -1 && lastMouseY != -1) {
@@ -76,7 +77,7 @@ function updateCursor() {
         lastMouseX = mouseX;
         lastMouseY = mouseY;
     }
-    setTimeout(updateCursor, 100);
+    setTimeout(updateCursor, pollingDelay);
 }
 
 function mouseReleased() {
