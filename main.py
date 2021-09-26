@@ -49,9 +49,7 @@ async def connect(sid: str, environ: dict):
 
 @sio.on("move_to")
 async def move_to(sid: str, data: dict):
-    delta_x = round(data["x"] - data["last_x"])
-    delta_y = round(data["y"] - data["last_y"])
-    pyautogui.moveRel(delta_x, delta_y)
+    pyautogui.moveRel(round(data["delta_x"]), round(data["delta_y"]))
 
 
 @sio.event

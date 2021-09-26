@@ -66,12 +66,12 @@ function updateCursor() {
         }
         if (lastMouseX != -1 && lastMouseY != -1) {
             padCanvas.line(last_x, last_y, x, y);
+            let delta_x = x - last_x;
+            let delta_y = y - last_y;
             socket.volatile.emit(
-                "move_to",
-                {"last_x": last_x, "last_y": last_y, "x": x, "y": y}
+                "move_to", {"delta_x": delta_x, "delta_y": delta_y}
             )
         }
-        fill(0);
         padCanvas.circle(x, y, 2);
         lastMouseX = mouseX;
         lastMouseY = mouseY;
