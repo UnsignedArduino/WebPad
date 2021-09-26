@@ -17,13 +17,9 @@ SKETCH_JS_PATH = WEB_APP_PATH / "sketch.js"
 routes = web.RouteTableDef()
 sio = socketio.AsyncServer(async_mode="aiohttp")
 
-pad_connected = False
-
 
 @routes.get("/")
 async def index_html(_) -> web.Response:
-    if pad_connected:
-        return web.Response(status=403)
     html = INDEX_HTML_PATH.read_text(encoding="utf-8")
     return web.Response(text=html, content_type="text/html")
 
@@ -47,8 +43,6 @@ async def static_file(request: web.Request) -> web.Response:
 
 @sio.event
 async def connect(sid: str, environ: dict):
-    global pad_connected
-    pad_connected = True
     logger.info(f"Connected to Socket {sid}")
     logging.debug(f"Request info: {environ}")
 
@@ -60,8 +54,6 @@ async def move_to(sid: str, data: dict):
 
 @sio.event
 async def disconnect(sid: str):
-    global pad_connected
-    pad_connected = False
     logger.warning(f"Disconnect from Socket {sid}")
 
 
