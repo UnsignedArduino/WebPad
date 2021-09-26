@@ -28,8 +28,6 @@ async def static_file(request: web.Request) -> web.Response:
     filename = request.match_info.get("filename", "index.html")
     if filename == "sketch.js":
         js = SKETCH_JS_PATH.read_text()
-        js = js.replace("const ipAddr = null;",
-                        f"const ipAddr = \"{ip}\";")
         return web.Response(text=js, content_type="text/javascript")
     else:
         path = WEB_APP_PATH / filename
@@ -43,27 +41,14 @@ async def static_file(request: web.Request) -> web.Response:
 
 
 @sio.event
-async def connect(sid, environ, auth):
-    print("Connect")
-    print(sid)
-    print(environ)
-    print(auth)
-    print()
-
-
-@sio.on("count")
-async def count(sid, data):
-    print("Count")
-    print(sid)
-    print(data)
-    print()
+async def connect(sid: str, environ: dict):
+    logger.info(f"Connected to Socket {sid}")
+    logging.debug(f"Request info: {environ}")
 
 
 @sio.event
-async def disconnect(sid):
-    print("Disconnect")
-    print(sid)
-    print()
+async def disconnect(sid: str):
+    logger.warning(f"Disconnect from Socket {sid}")
 
 
 logger.debug("Obtaining IP address")
