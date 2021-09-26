@@ -30,10 +30,7 @@ async def index_html(_) -> web.Response:
 
 @routes.get("/{filename}")
 async def static_file(request: web.Request) -> web.Response:
-    try:
-        filename = request.match_info.get("filename")
-    except KeyError:
-        return web.Response(status=404)
+    filename = request.match_info.get("filename", "index.html")
     if filename == "sketch.js":
         js = SKETCH_JS_PATH.read_text()
         return web.Response(text=js, content_type="text/javascript")
@@ -59,11 +56,6 @@ async def connect(sid: str, environ: dict):
 @sio.on("move_to")
 async def move_to(sid: str, data: dict):
     pyautogui.moveRel(round(data["delta_x"]), round(data["delta_y"]))
-
-
-@sio.on("our_ping")
-async def our_ping(sid: str):
-    await sio.emit("our_pong")
 
 
 @sio.event
