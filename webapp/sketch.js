@@ -31,22 +31,28 @@ function setup() {
         status = "Disconnected";
         console.log("Disconnected")
     })
+    updateCursor();
 }
 
 function draw() {
     background(220);
     updateTopBarStuff();
-    updateCursor();
     image(padCanvas, 0, padY);
 }
 
 function updateTopBarStuff() {
-    fill(0);
+    fill(0, 0, 0);
     text("Status: " + status, 10, 20);
 }
 
 function updateCursor() {
-    stroke(0);
+    if (socket.connected) {
+        stroke(0, 0, 0);
+        fill(0, 0, 0);
+    } else {
+        stroke(255, 0, 0);
+        fill(255, 0, 0);
+    }
     if (mouseIsPressed) {
         let last_x = lastMouseX;
         let last_y = lastMouseY - padY;
@@ -55,18 +61,22 @@ function updateCursor() {
         if ((last_x == x && last_y == y) ||
             (x > windowWidth || x < 0) ||
             (y > windowHeight || y < padY / 2)) {
+            setTimeout(updateCursor, 100);
             return;
         }
         if (lastMouseX != -1 && lastMouseY != -1) {
             padCanvas.line(last_x, last_y, x, y);
-            socket.emit("move_to", {"last_x": last_x, "last_y": last_y,
-                                    "x": x, "y": y})
+            socket.volatile.emit(
+                "move_to",
+                {"last_x": last_x, "last_y": last_y, "x": x, "y": y}
+            )
         }
         fill(0);
         padCanvas.circle(x, y, 2);
         lastMouseX = mouseX;
         lastMouseY = mouseY;
     }
+    setTimeout(updateCursor, 100);
 }
 
 function mouseReleased() {

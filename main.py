@@ -2,6 +2,7 @@ import logging
 import socket
 from pathlib import Path
 
+import pyautogui
 import socketio
 from aiohttp import web
 
@@ -48,7 +49,9 @@ async def connect(sid: str, environ: dict):
 
 @sio.on("move_to")
 async def move_to(sid: str, data: dict):
-    logger.debug(f"Socket {sid} got: {data}")
+    delta_x = round(data["x"] - data["last_x"])
+    delta_y = round(data["y"] - data["last_y"])
+    pyautogui.moveRel(delta_x, delta_y)
 
 
 @sio.event
