@@ -18,6 +18,7 @@ let socket;
 let pollingDelay = 25;
 
 let padCanvas;
+let needToClear = false;
 
 function setup() {
     noPulldownRefresh();
@@ -25,8 +26,7 @@ function setup() {
     height = windowHeight;
     createCanvas(width, height - 5);
     padCanvas = createGraphics(width, height - padY);
-    padCanvas.clear();
-    padCanvas.background(200);
+    clearPadCanvas();
     socket = io();
     socket.on("connect", () => {
         status = "Connected";
@@ -46,17 +46,17 @@ function draw() {
 }
 
 function updateTopBarStuff() {
-    fill(0, 0, 0);
+    padCanvas.fill(0, 0, 0);
     text("Status: " + status, 10, 20);
 }
 
 function updateCursor() {
     if (socket.connected) {
-        stroke(0, 0, 0);
-        fill(0, 0, 0);
+        padCanvas.stroke(0, 0, 0);
+        padCanvas.fill(0, 0, 0);
     } else {
-        stroke(255, 0, 0);
-        fill(255, 0, 0);
+        padCanvas.stroke(255, 0, 0);
+        padCanvas.fill(255, 0, 0);
     }
     if (mouseIsPressed) {
         let last_x = lastMouseX;
@@ -68,6 +68,9 @@ function updateCursor() {
             (y > windowHeight || y < padY / 2)) {
             setTimeout(updateCursor, pollingDelay);
             return;
+        }
+        if (needToClear) {
+            clearPadCanvas();
         }
         if (lastMouseX != -1 && lastMouseY != -1) {
             padCanvas.line(last_x, last_y, x, y);
@@ -86,6 +89,16 @@ function updateCursor() {
 
 function leftClick() {
     socket.volatile.emit("left_click");
+    padCanvas.fill(180);
+    padCanvas.rect(0, 0, width / 2, height - padY);
+    needToClear = true;
+    setTimeout(clearPadCanvas, 100);
+}
+
+function clearPadCanvas() {
+    padCanvas.clear()
+    padCanvas.background(200);
+    needToClear = false;
 }
 
 function mousePressed() {
@@ -97,10 +110,10 @@ function mouseReleased() {
     updateCursor();
     lastMouseX = -1;
     lastMouseY = -1;
-    padCanvas.clear();
-    padCanvas.background(200);
+    clearPadCanvas();
     if ((Math.abs(startMouseX - mouseX) <= clickMaxDiff) &&
-        (Math.abs(startMouseY - mouseY) <= clickMaxDiff)) {
+        (Math.abs(startMouseY - mouseY) <= clickMaxDiff) &&
+        mouseX <= width / 2) {
         leftClick();
     }
     return false;
