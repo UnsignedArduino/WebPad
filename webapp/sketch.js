@@ -6,6 +6,10 @@ let height;
 let lastMouseX = -1;
 let lastMouseY = -1;
 
+let startMouseX;
+let startMouseY;
+const clickMaxDiff = 5;
+
 let status = "Not connected";
 
 const padY = 30;
@@ -80,12 +84,25 @@ function updateCursor() {
     setTimeout(updateCursor, pollingDelay);
 }
 
+function leftClick() {
+    socket.volatile.emit("left_click");
+}
+
+function mousePressed() {
+    startMouseX = mouseX;
+    startMouseY = mouseY;
+}
+
 function mouseReleased() {
     updateCursor();
     lastMouseX = -1;
     lastMouseY = -1;
     padCanvas.clear();
     padCanvas.background(200);
+    if ((Math.abs(startMouseX - mouseX) <= clickMaxDiff) &&
+        (Math.abs(startMouseY - mouseY) <= clickMaxDiff)) {
+        leftClick();
+    }
     return false;
 }
 
@@ -94,44 +111,33 @@ function noPulldownRefresh() {
     var touchStartHandler,
         touchMoveHandler,
         touchPoint;
-
     // Only needed for touch events on chrome.
     if ((window.chrome || navigator.userAgent.match("CriOS"))
         && "ontouchstart" in document.documentElement) {
-
         touchStartHandler = function() {
             // Only need to handle single-touch cases
             touchPoint = event.touches.length === 1 ? event.touches[0].clientY : null;
         };
-
         touchMoveHandler = function(event) {
             var newTouchPoint;
-
             // Only need to handle single-touch cases
             if (event.touches.length !== 1) {
                 touchPoint = null;
-
                 return;
             }
-
             // We only need to defaultPrevent when scrolling up
-            //
             // newTouchPoint = event.touches[0].clientY;
             // if (newTouchPoint > touchPoint) {
             //     event.preventDefault();
             // }
             // touchPoint = newTouchPoint;
-
             event.preventDefault();
         };
-
         document.addEventListener("touchstart", touchStartHandler, {
             passive: false
         });
-
         document.addEventListener("touchmove", touchMoveHandler, {
             passive: false
         });
-
     }
 }

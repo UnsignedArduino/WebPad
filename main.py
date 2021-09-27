@@ -57,6 +57,11 @@ async def move_to(sid: str, data: dict):
     pyautogui.moveRel(round(data["delta_x"]), round(data["delta_y"]))
 
 
+@sio.on("left_click")
+async def left_click(sid: str):
+    pyautogui.leftClick()
+
+
 @sio.event
 async def disconnect(sid: str):
     logger.warning(f"Disconnect from Socket {sid}")
