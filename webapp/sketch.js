@@ -95,6 +95,14 @@ function leftClick() {
     setTimeout(clearPadCanvas, 100);
 }
 
+function rightClick() {
+    socket.volatile.emit("right_click");
+    padCanvas.fill(180);
+    padCanvas.rect(width / 2, 0, width / 2, height - padY);
+    needToClear = true;
+    setTimeout(clearPadCanvas, 100);
+}
+
 function clearPadCanvas() {
     padCanvas.clear()
     padCanvas.background(200);
@@ -112,9 +120,12 @@ function mouseReleased() {
     lastMouseY = -1;
     clearPadCanvas();
     if ((Math.abs(startMouseX - mouseX) <= clickMaxDiff) &&
-        (Math.abs(startMouseY - mouseY) <= clickMaxDiff) &&
-        mouseX <= width / 2) {
-        leftClick();
+        (Math.abs(startMouseY - mouseY) <= clickMaxDiff)) {
+        if (mouseX <= width / 2) {
+            leftClick();
+        } else if (mouseX > width / 2) {
+            rightClick();
+        }
     }
     return false;
 }

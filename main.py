@@ -62,6 +62,11 @@ async def left_click(sid: str):
     pyautogui.leftClick()
 
 
+@sio.on("right_click")
+async def left_click(sid: str):
+    pyautogui.rightClick()
+
+
 @sio.event
 async def disconnect(sid: str):
     logger.warning(f"Disconnect from Socket {sid}")
