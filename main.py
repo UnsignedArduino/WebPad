@@ -57,14 +57,9 @@ async def move_to(sid: str, data: dict):
     pyautogui.moveRel(round(data["delta_x"]), round(data["delta_y"]))
 
 
-@sio.on("left_click")
-async def left_click(sid: str):
-    pyautogui.leftClick()
-
-
-@sio.on("right_click")
-async def left_click(sid: str):
-    pyautogui.rightClick()
+@sio.on("click")
+async def click(sid: str, data: str):
+    pyautogui.click(button=data)
 
 
 @sio.event

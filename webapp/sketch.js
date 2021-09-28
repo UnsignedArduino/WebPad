@@ -88,7 +88,7 @@ function updateCursor() {
 }
 
 function leftClick() {
-    socket.volatile.emit("left_click");
+    socket.volatile.emit("click", "left");
     padCanvas.fill(180);
     padCanvas.rect(0, 0, width / 2, height - padY);
     needToClear = true;
@@ -96,7 +96,7 @@ function leftClick() {
 }
 
 function rightClick() {
-    socket.volatile.emit("right_click");
+    socket.volatile.emit("click", "right");
     padCanvas.fill(180);
     padCanvas.rect(width / 2, 0, width / 2, height - padY);
     needToClear = true;
