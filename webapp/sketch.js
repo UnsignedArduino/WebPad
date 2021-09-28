@@ -20,8 +20,15 @@ let pollingDelay = 25;
 let padCanvas;
 let needToClear = false;
 
+let tapSound;
+
+function preload() {
+    tapSound = loadSound("tap.mp3");
+}
+
 function setup() {
     noPulldownRefresh();
+    userStartAudio();
     width = windowWidth;
     height = windowHeight;
     createCanvas(width, height - 5);
@@ -91,6 +98,7 @@ function leftClick() {
     socket.volatile.emit("click", "left");
     padCanvas.fill(180);
     padCanvas.rect(0, 0, width / 2, height - padY);
+    tap();
     needToClear = true;
     setTimeout(clearPadCanvas, 100);
 }
@@ -99,8 +107,15 @@ function rightClick() {
     socket.volatile.emit("click", "right");
     padCanvas.fill(180);
     padCanvas.rect(width / 2, 0, width / 2, height - padY);
+    tap();
     needToClear = true;
     setTimeout(clearPadCanvas, 100);
+}
+
+function tap() {
+    if (tapSound.isLoaded()) {
+        tapSound.play();
+    }
 }
 
 function clearPadCanvas() {

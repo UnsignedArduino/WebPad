@@ -30,6 +30,7 @@ async def index_html(_) -> web.Response:
 async def static_file(request: web.Request) -> web.Response:
     try:
         filename = request.match_info.get("filename")
+        logger.debug(f"Request for file {filename}")
     except KeyError:
         return web.Response(status=404)
     if filename == "sketch.js":
@@ -39,11 +40,16 @@ async def static_file(request: web.Request) -> web.Response:
         path = WEB_APP_PATH / filename
         if not path.exists():
             return web.Response(status=404)
-        stuff = path.read_text(encoding="utf-8")
         mimetypes = {".js": "text/javascript",
-                     ".html": "text/html"}
+                     ".html": "text/html",
+                     ".mp3": "audio/mpeg"}
         mimetype = mimetypes.get(path.suffix, "text/plain")
-        return web.Response(text=stuff, content_type=mimetype)
+        try:
+            stuff = path.read_text(encoding="utf-8")
+            return web.Response(text=stuff, content_type=mimetype)
+        except UnicodeDecodeError:
+            stuff = path.read_bytes()
+            return web.Response(body=stuff, content_type=mimetype)
 
 
 @sio.event
