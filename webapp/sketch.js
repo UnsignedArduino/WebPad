@@ -46,6 +46,11 @@ function setup() {
         status = "Disconnected";
         console.log("Disconnected")
     })
+    window.addEventListener("orientationchange", () => {
+        if (confirm("You need to reload this page for WebPad to rotate properly. Reload?")) {
+            window.location.reload(true);
+        }
+    })
     updateCursor();
 }
 
