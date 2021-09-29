@@ -1,5 +1,4 @@
 import logging
-import socket
 from pathlib import Path
 
 import pyautogui
@@ -7,6 +6,7 @@ import socketio
 from aiohttp import web
 
 from create_logger import create_logger
+from get_ip import get_ip_addr
 
 logger = create_logger(name=__name__, level=logging.DEBUG)
 
@@ -40,7 +40,6 @@ async def index_html(_) -> web.Response:
 async def static_file(request: web.Request) -> web.Response:
     try:
         filename = request.match_info.get("filename")
-        logger.debug(f"Request for file {filename}")
     except KeyError:
         return web.Response(status=404)
     if filename == "sketch.js":
@@ -103,15 +102,12 @@ async def disconnect(sid: str):
     logger.warning(f"Disconnect from Socket {sid}")
 
 
-logger.debug("Obtaining IP address")
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-    sock.connect(("8.8.8.8", 80))
-    ip = sock.getsockname()[0]
-
-
 app = web.Application()
+logger.debug("Attaching socket.io handlers")
 sio.attach(app)
+logger.debug("Attaching server routes")
 app.add_routes(routes)
 
+ip = get_ip_addr()
 logger.info(f"Starting server at http://{ip}")
-web.run_app(app, host="0.0.0.0", port=80)
+web.run_app(app, host="0.0.0.0", port=80, print=None, access_log=logger)
