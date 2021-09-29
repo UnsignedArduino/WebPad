@@ -59,9 +59,17 @@ async def static_file(request: web.Request) -> web.Response:
 
 
 @sio.event
-async def connect(sid: str, environ: dict):
+async def connect(sid: str, environ: dict, auth: dict):
     logger.info(f"Connected to Socket {sid}")
-    logging.debug(f"Request info: {environ}")
+    logger.debug(f"Request info: {environ}")
+    logger.debug(f"Authentication: {auth}")
+    accept = input(f"A WebPad device (appears to be: {auth['device']}) is "
+                   f"trying to connect. Accept? (y/n) ").lower()
+    if accept in ("y", "yes"):
+        logger.info("WebPad accepted!")
+    else:
+        logger.info("WebPad denied.")
+        return False
 
 
 @sio.on("move_to")

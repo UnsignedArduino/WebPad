@@ -37,20 +37,31 @@ function setup() {
     createCanvas(width, height - 5);
     padCanvas = createGraphics(width, height - padY);
     clearPadCanvas();
-    socket = io();
+    console.log(platform.description);
+    socket = io({
+        auth: {
+            device: platform.description
+        }
+    });
     socket.on("connect", () => {
         status = "Connected";
-        console.log("Connected as socket ID " + socket.id)
-    })
+        console.log("Connected as socket ID " + socket.id);
+    });
+    socket.on("connect_error", (err) => {
+        status = "Error connecting to host"
+        if (confirm("There was an error connecting. Reload to try again?")) {
+            window.location.reload(true);
+        }
+    });
     socket.on("disconnect", () => {
         status = "Disconnected";
         console.log("Disconnected")
-    })
+    });
     window.addEventListener("orientationchange", () => {
         if (confirm("You need to reload this page for WebPad to rotate properly. Reload?")) {
             window.location.reload(true);
         }
-    })
+    });
     updateCursor();
 }
 
