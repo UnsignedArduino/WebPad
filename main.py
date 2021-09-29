@@ -10,6 +10,8 @@ from create_logger import create_logger
 
 logger = create_logger(name=__name__, level=logging.DEBUG)
 
+ALLOW_SOUND = True
+
 WEB_APP_PATH = Path.cwd() / "webapp"
 INDEX_HTML_PATH = WEB_APP_PATH / "index.html"
 SKETCH_JS_PATH = WEB_APP_PATH / "sketch.js"
@@ -35,6 +37,9 @@ async def static_file(request: web.Request) -> web.Response:
         return web.Response(status=404)
     if filename == "sketch.js":
         js = SKETCH_JS_PATH.read_text()
+        play_sound = "true" if ALLOW_SOUND else "false"
+        js = js.replace("const playSounds = true;",
+                        f"const playSounds = {play_sound};")
         return web.Response(text=js, content_type="text/javascript")
     else:
         path = WEB_APP_PATH / filename

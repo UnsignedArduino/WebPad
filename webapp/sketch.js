@@ -21,9 +21,12 @@ let padCanvas;
 let needToClear = false;
 
 let tapSound;
+const playSounds = true;
 
 function preload() {
-    tapSound = loadSound("tap.mp3");
+    if (playSounds) {
+        tapSound = loadSound("tap.mp3");
+    }
 }
 
 function setup() {
@@ -113,7 +116,7 @@ function rightClick() {
 }
 
 function tap() {
-    if (tapSound.isLoaded()) {
+    if (playSounds && tapSound.isLoaded()) {
         tapSound.play();
     }
 }
