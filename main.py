@@ -11,6 +11,7 @@ from create_logger import create_logger
 logger = create_logger(name=__name__, level=logging.DEBUG)
 
 ALLOW_SOUND = True
+SPEED = 1.0
 
 WEB_APP_PATH = Path.cwd() / "webapp"
 INDEX_HTML_PATH = WEB_APP_PATH / "index.html"
@@ -65,7 +66,8 @@ async def connect(sid: str, environ: dict):
 
 @sio.on("move_to")
 async def move_to(sid: str, data: dict):
-    pyautogui.moveRel(round(data["delta_x"]), round(data["delta_y"]))
+    pyautogui.moveRel(round(data["delta_x"] * SPEED),
+                      round(data["delta_y"] * SPEED))
 
 
 @sio.on("click")
