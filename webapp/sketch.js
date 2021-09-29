@@ -79,10 +79,7 @@ function updateTopBarStuff() {
     text("Status: " + status, 10, 20);
 }
 
-function updateCursor() {
-    if (!allowMove) {
-        return;
-    }
+function updateColors() {
     if (socket.connected) {
         padCanvas.stroke(0, 0, 0);
         padCanvas.fill(0, 0, 0);
@@ -90,6 +87,13 @@ function updateCursor() {
         padCanvas.stroke(255, 0, 0);
         padCanvas.fill(255, 0, 0);
     }
+}
+
+function updateCursor() {
+    if (!allowMove) {
+        return;
+    }
+    updateColors();
     if (mouseIsPressed) {
         let last_x = lastMouseX;
         let last_y = lastMouseY - padY;
@@ -121,8 +125,9 @@ function updateCursor() {
 
 function leftClick() {
     socket.volatile.emit("click", "left");
+    updateColors();
     padCanvas.fill(180);
-    padCanvas.rect(0, 0, width / 2, height - padY);
+    padCanvas.rect(0, 0, width / 2, height - padY - 1);
     tap();
     needToClear = true;
     setTimeout(clearPadCanvas, 100);
@@ -130,8 +135,9 @@ function leftClick() {
 
 function rightClick() {
     socket.volatile.emit("click", "right");
+    updateColors();
     padCanvas.fill(180);
-    padCanvas.rect(width / 2, 0, width / 2, height - padY);
+    padCanvas.rect(width / 2, 0, width / 2, height - padY - 1);
     tap();
     needToClear = true;
     setTimeout(clearPadCanvas, 100);
@@ -160,6 +166,7 @@ function mouseReleased() {
     lastMouseY = -1;
     clearPadCanvas();
     if (allowClick &&
+        (mouseY >= padY && mouseY <= height) &&
         (Math.abs(startMouseX - mouseX) <= clickMaxDiff) &&
         (Math.abs(startMouseY - mouseY) <= clickMaxDiff)) {
         if (mouseX <= width / 2) {
