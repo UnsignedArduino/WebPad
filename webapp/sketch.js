@@ -21,10 +21,13 @@ let padCanvas;
 let needToClear = false;
 
 let tapSound;
-const playSounds = true;
+
+const allowSounds = true;
+const allowMove = true;
+const allowClick = true;
 
 function preload() {
-    if (playSounds) {
+    if (allowSounds) {
         tapSound = loadSound("tap.mp3");
     }
 }
@@ -77,6 +80,9 @@ function updateTopBarStuff() {
 }
 
 function updateCursor() {
+    if (!allowMove) {
+        return;
+    }
     if (socket.connected) {
         padCanvas.stroke(0, 0, 0);
         padCanvas.fill(0, 0, 0);
@@ -132,7 +138,7 @@ function rightClick() {
 }
 
 function tap() {
-    if (playSounds && tapSound.isLoaded()) {
+    if (allowSounds && tapSound.isLoaded()) {
         tapSound.play();
     }
 }
@@ -153,7 +159,8 @@ function mouseReleased() {
     lastMouseX = -1;
     lastMouseY = -1;
     clearPadCanvas();
-    if ((Math.abs(startMouseX - mouseX) <= clickMaxDiff) &&
+    if (allowClick &&
+        (Math.abs(startMouseX - mouseX) <= clickMaxDiff) &&
         (Math.abs(startMouseY - mouseY) <= clickMaxDiff)) {
         if (mouseX <= width / 2) {
             leftClick();

@@ -10,8 +10,11 @@ from create_logger import create_logger
 
 logger = create_logger(name=__name__, level=logging.DEBUG)
 
+ACCEPTING_CONNS = True
 ALLOW_SOUND = True
 SPEED = 1.0
+ALLOW_MOVE = True
+ALLOW_CLICK = True
 
 WEB_APP_PATH = Path.cwd() / "webapp"
 INDEX_HTML_PATH = WEB_APP_PATH / "index.html"
@@ -21,6 +24,10 @@ routes = web.RouteTableDef()
 sio = socketio.AsyncServer(async_mode="aiohttp")
 
 pyautogui.PAUSE = 0
+
+
+def js_bool(py_bool: bool) -> str:
+    return "true" if py_bool else "false"
 
 
 @routes.get("/")
@@ -38,9 +45,12 @@ async def static_file(request: web.Request) -> web.Response:
         return web.Response(status=404)
     if filename == "sketch.js":
         js = SKETCH_JS_PATH.read_text()
-        play_sound = "true" if ALLOW_SOUND else "false"
-        js = js.replace("const playSounds = true;",
-                        f"const playSounds = {play_sound};")
+        js = js.replace("const allowSounds = true;",
+                        f"const allowSounds = {js_bool(ALLOW_SOUND)};")
+        js = js.replace("const allowMove = true;",
+                        f"const allowMove = {js_bool(ALLOW_MOVE)};")
+        js = js.replace("const allowClick = true;",
+                        f"const allowClick = {js_bool(ALLOW_CLICK)};")
         return web.Response(text=js, content_type="text/javascript")
     else:
         path = WEB_APP_PATH / filename
@@ -60,27 +70,32 @@ async def static_file(request: web.Request) -> web.Response:
 
 @sio.event
 async def connect(sid: str, environ: dict, auth: dict):
-    logger.info(f"Connected to Socket {sid}")
+    logger.info(f"Connecting to Socket {sid}")
     logger.debug(f"Request info: {environ}")
     logger.debug(f"Authentication: {auth}")
+    if not ACCEPTING_CONNS:
+        logger.info("Automatically denied")
+        return False
     accept = input(f"A WebPad device (appears to be: {auth['device']}) is "
                    f"trying to connect. Accept? (y/n) ").lower()
     if accept in ("y", "yes"):
         logger.info("WebPad accepted!")
     else:
-        logger.info("WebPad denied.")
+        logger.info("WebPad denied")
         return False
 
 
 @sio.on("move_to")
 async def move_to(sid: str, data: dict):
-    pyautogui.moveRel(round(data["delta_x"] * SPEED),
-                      round(data["delta_y"] * SPEED))
+    if ALLOW_MOVE:
+        pyautogui.moveRel(round(data["delta_x"] * SPEED),
+                          round(data["delta_y"] * SPEED))
 
 
 @sio.on("click")
 async def click(sid: str, data: str):
-    pyautogui.click(button=data)
+    if ALLOW_CLICK:
+        pyautogui.click(button=data)
 
 
 @sio.event
